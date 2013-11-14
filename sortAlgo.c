@@ -236,7 +236,17 @@ void strand_sort(int *to_sort, int size) {
             last_sublist = last_sublist->next;
         }
     }
-    print_list(ordered_list);
+
+    /* Update the initial vector with the sorted list */
+    for (i = 0, list_iterator = ordered_list; i < size; i++) {
+        to_sort[i] = list_iterator->value;
+        list_iterator = list_iterator->next;
+    }
+    
+    /* Free the resources */
+    delete_list(ordered_list);
+    delete_list(sublist);
+    delete_list(list_to_sort);
 }
 
 int main() {
@@ -249,7 +259,7 @@ int main() {
     v[8] = -1;
     print(v, 10);
     strand_sort(v, 10);
-//    print(v, 10);
+    print(v, 10);
     free(v);
 
     return 0;
