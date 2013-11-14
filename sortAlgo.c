@@ -15,6 +15,7 @@ Node* init_list() {
     new->next = NULL;
 }
 
+/* Insert a node at the beginning of a list */
 void push_front(Node **list, int val) {
     Node *new = malloc(sizeof(Node));
     new->value = val;
@@ -22,12 +23,22 @@ void push_front(Node **list, int val) {
     (*list) = new;
 }
 
+/* Insert a node after a given node */
 void push_after(Node **last, int val) {
     Node *new = malloc(sizeof(Node));
     new->value = val;
     new->next = (*last)->next;
     (*last)->next = new;
     (*last) = new;
+}
+
+/* Insert a node at a given location */
+void insert_at(Node *node, int val) {
+    Node *new = malloc(sizeof(Node));
+    new->value = node->value;
+    new->next = node->next;
+    node->value = val;
+    node->next = new;
 }
 
 void delete_node(Node *to_delete) {
@@ -51,7 +62,6 @@ void print_list(Node *list) {
         list = list->next;
     }
 }
-
 
 /* Swap 2 values */
 void swap(int *a, int *b) {
@@ -182,11 +192,13 @@ void quicksort_wrapper(int *to_sort, int size) {
 void strand_sort(int *to_sort, int size) {
     int i;
 
+    Node *list_to_sort = init_list();
     Node *sublist = NULL;
+    Node *list_iterator = NULL;
+    Node *last_sublist = NULL;
     Node *ordered_list = init_list();
 
     /* Copy the initial array into a linked list */
-    Node *list_to_sort = init_list();
     for (i = size - 1; i >= 0; i--) {
         push_front(&list_to_sort, to_sort[i]);
     }
@@ -206,23 +218,26 @@ void strand_sort(int *to_sort, int size) {
             push_after(&last_sublist, list_iterator->value);
             delete_node(list_iterator);
         }
+
+        /* Merge sublist into ordered_list */
+        last_sublist = sublist;
+        list_iterator = ordered_list;
+        while (last_sublist->next && list_iterator->next) {
+            if (last_sublist->value < list_iterator->value) {
+                insert_at(list_iterator, last_sublist->value);
+                last_sublist = last_sublist->next;
+            } else {
+                list_iterator = list_iterator->next;
+            }
+        }
+        while (last_sublist->next) {
+            insert_at(list_iterator, last_sublist->value);
+            list_iterator = list_iterator->next;
+            last_sublist = last_sublist->next;
+        }
     }
-
-    //list_to_sort = sublist;
-    //while (list_to_sort) {
-    //    printf("%d ", list_to_sort->value);
-    //    list_to_sort = list_to_sort->next;
-    //}
+    print_list(ordered_list);
 }
-
-
-        
-    
-    
-
-
-
-
 
 int main() {
     int *v = malloc(10 * sizeof(int));
