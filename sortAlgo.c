@@ -98,6 +98,31 @@ void shellsort(int *to_sort, int size) {
     }
 }
 
+/* Quicksort, as shown in Introduction to Algorithms */
+
+/* Returns the final index of the pivot */
+int partition(int *to_sort, int left, int right) {
+    int i, j;
+    int pivot = to_sort[right];
+    i = left - 1;
+    for (j = left; j <= right - 1; j++) {
+        if (to_sort[j] <= pivot) {
+            i++;
+            swap(&to_sort[i], &to_sort[j]);
+        }
+    }
+    swap(&to_sort[i + 1], &to_sort[right]);
+    return i + 1;
+}
+
+void quicksort(int *to_sort, int left, int right) {
+    if (left < right) {
+        int pivot_index = partition(to_sort, left, right);
+        quicksort(to_sort, left, pivot_index - 1);
+        quicksort(to_sort, pivot_index + 1, right);
+    }
+}
+
 int main() {
     int *v = malloc(10 * sizeof(int));
     int i, j;
@@ -106,7 +131,7 @@ int main() {
     v[6] = -4;
     v[8] = -1;
     print(v, 10);
-    shellsort(v, 10);
+    quicksort(v, 0, 9);
     print(v, 10);
 
     return 0;
