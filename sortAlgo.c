@@ -32,13 +32,25 @@ void bubble_sort(int *to_sort, int size) {
     }
 }
 
+/* Insertion sort, as shown in "Introduction to Algorithms" */
+void insertion_sort(int *to_sort, int size) {
+    int i, j;
+    for (j = 1; j < size; j++) {
+        for (i = j - 1; i >= 0; i--) {
+            if (to_sort[i + 1] < to_sort[i]) {
+                swap(&to_sort[i], &to_sort[i + 1]);
+            }
+        }
+    }
+}
+
 int main() {
     int *v = malloc(10 * sizeof(int));
     int i, j;
     for (i = 0, j = 10; i < 10; i++)
         v[i] = j--;
     print(v, 10);
-    bubble_sort(v, 10);
+    insertion_sort(v, 10);
     print(v, 10);
 
     return 0;
