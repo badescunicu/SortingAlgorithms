@@ -34,6 +34,35 @@ void bubble_sort(int *to_sort, int size) {
     }
 }
 
+void cocktail_sort(int *to_sort, int size) {
+    int i, swapped = 1;
+    while (swapped) {
+        /* Go from left to right */
+        swapped = 0;
+        for (i = 0; i < size - 1; i++) {
+            if (to_sort[i] > to_sort[i + 1]) {
+                swapped = 1;
+                swap(&to_sort[i], &to_sort[i + 1]);
+            }
+        }
+
+        /* Break if the array is already sorted */
+        if (!swapped) {
+            break;
+        }
+
+        /* Go from right to left */
+        swapped = 0;
+        for (i = size - 1; i > 0; i--) {
+            if (to_sort[i - 1] > to_sort[i]) {
+                swapped = 1;
+                swap(&to_sort[i - 1], &to_sort[i]);
+            }
+        }
+    }
+}
+
+
 /* Insertion sort, as shown in "Introduction to Algorithms" */
 void insertion_sort(int *to_sort, int size) {
     int i, j;
@@ -71,7 +100,7 @@ int main() {
     v[6] = -4;
     v[8] = -1;
     print(v, 10);
-    shellsort(v, 10);
+    cocktail_sort(v, 10);
     print(v, 10);
 
     return 0;
