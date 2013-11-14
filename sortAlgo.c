@@ -67,27 +67,33 @@ void cocktail_sort(int *to_sort, int size) {
 void insertion_sort(int *to_sort, int size) {
     int i, j;
     for (j = 1; j < size; j++) {
-        for (i = j - 1; i >= 0; i--) {
-            if (to_sort[i + 1] < to_sort[i]) {
-                swap(&to_sort[i], &to_sort[i + 1]);
-            }
+        int to_insert = to_sort[j];
+        i = j - 1;
+        
+        while (i >= 0 && to_sort[i] > to_insert) {
+            to_sort[i + 1] = to_sort[i];
+            i--;
         }
+        to_sort[i + 1] = to_insert;
     }
 }
 
 /* Shellsort using Ciura's gaps */
 void shellsort(int *to_sort, int size) {
     int gaps[] = {701, 301, 132, 57, 23, 10, 4, 1};
-    int gap_iterator, i, j;
+    int gap_index, i, j, to_insert;
     /* Cycle through gaps */
-    for (gap_iterator = 0; gap_iterator < GAPS_SIZE; gap_iterator++) {
+    for (gap_index = 0; gap_index < GAPS_SIZE; gap_index++) {
         /* Perform an Insertion Sort for each gap */
-        for (i = gaps[gap_iterator]; i < size; i++) {
-            for (j = i; j >= gaps[gap_iterator]; j--) {
-                if (to_sort[j] < to_sort[j - gaps[gap_iterator]]) {
-                    swap(&to_sort[j], &to_sort[j - gaps[gap_iterator]]);
-                }
+        for (i = gaps[gap_index]; i < size; i++) {
+            to_insert = to_sort[i];
+            j = i;
+            while (j >= gaps[gap_index] &&\
+                    to_sort[j - gaps[gap_index]] > to_insert) {
+                to_sort[j] = to_sort[j - gaps[gap_index]];
+                j -= gaps[gap_index];
             }
+            to_sort[j] = to_insert;
         }
     }
 }
@@ -100,7 +106,7 @@ int main() {
     v[6] = -4;
     v[8] = -1;
     print(v, 10);
-    cocktail_sort(v, 10);
+    shellsort(v, 10);
     print(v, 10);
 
     return 0;
