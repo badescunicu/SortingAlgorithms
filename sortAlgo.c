@@ -1,7 +1,57 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #define GAPS_SIZE 8
+
+typedef struct Node {
+    int value;
+    struct Node *next;
+}Node;
+
+Node* init_list() {
+    Node *new = malloc(sizeof(Node));
+    new->value = INT_MIN;
+    new->next = NULL;
+}
+
+void push_front(Node **list, int val) {
+    Node *new = malloc(sizeof(Node));
+    new->value = val;
+    new->next = (*list);
+    (*list) = new;
+}
+
+void push_after(Node **last, int val) {
+    Node *new = malloc(sizeof(Node));
+    new->value = val;
+    new->next = (*last)->next;
+    (*last)->next = new;
+    (*last) = new;
+}
+
+void delete_node(Node *to_delete) {
+    Node *tmp = to_delete->next;
+    to_delete->value = to_delete->next->value;
+    to_delete->next = to_delete->next->next;
+    free(tmp);
+}
+
+void delete_list(Node *list) {
+    while(list) {
+        Node *tmp = list;
+        list = list->next;
+        free(tmp);
+    }
+}
+
+void print_list(Node *list) {
+    while (list->next) {
+        printf("%d ", list->value);
+        list = list->next;
+    }
+}
+
 
 /* Swap 2 values */
 void swap(int *a, int *b) {
@@ -22,7 +72,6 @@ void print(int *v, int n) {
 
 void bubble_sort(int *to_sort, int size) {
     int i, swapped = 1;
-
     while (swapped) {
         swapped = 0;
         for (i = 0; i < size - 1; i++) {
@@ -103,6 +152,7 @@ void shellsort(int *to_sort, int size) {
 /* Returns the final index of the pivot */
 int partition(int *to_sort, int left, int right) {
     int i, j;
+    /* Choose the last element as a pivot, to allow in place sorting */
     int pivot = to_sort[right];
     i = left - 1;
     for (j = left; j <= right - 1; j++) {
@@ -123,17 +173,69 @@ void quicksort(int *to_sort, int left, int right) {
     }
 }
 
+/* Allow the quicksort function to be called in the same way
+ * as the others */
+void quicksort_wrapper(int *to_sort, int size) {
+    quicksort(to_sort, 0, size - 1);
+}
+
+void strand_sort(int *to_sort, int size) {
+    int i;
+
+    Node *sublist = NULL;
+    Node *ordered_list = init_list();
+
+    /* Copy the initial array into a linked list */
+    Node *list_to_sort = init_list();
+    for (i = size - 1; i >= 0; i--) {
+        push_front(&list_to_sort, to_sort[i]);
+    }
+    
+    while (list_to_sort->next) {
+        /* Delete the old sublist */
+        delete_list(sublist);
+        sublist = init_list();
+        
+        /* Add first sequence of ordered numbers in sublist */
+        push_front(&sublist, list_to_sort->value);
+        delete_node(list_to_sort);
+        Node *list_iterator = list_to_sort;
+        Node *last_sublist = sublist;
+        while (list_iterator->next &&\
+               list_iterator->value > last_sublist->value) {
+            push_after(&last_sublist, list_iterator->value);
+            delete_node(list_iterator);
+        }
+    }
+
+    //list_to_sort = sublist;
+    //while (list_to_sort) {
+    //    printf("%d ", list_to_sort->value);
+    //    list_to_sort = list_to_sort->next;
+    //}
+}
+
+
+        
+    
+    
+
+
+
+
+
 int main() {
     int *v = malloc(10 * sizeof(int));
     int i, j;
     for (i = 0, j = 10; i < 10; i++)
         v[i] = j--;
+    v[0] = -7;
     v[6] = -4;
     v[8] = -1;
     print(v, 10);
-    quicksort(v, 0, 9);
-    print(v, 10);
+    strand_sort(v, 10);
+//    print(v, 10);
+    free(v);
 
     return 0;
 }
-
