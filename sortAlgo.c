@@ -1,9 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <math.h>
 
 #define GAPS_SIZE 8
 
+/* List to hold the dimensions of the Leonardo heaps used in Smoothsort*/
+typedef struct {
+    int *v;
+    int size;
+} leonardo_dimensions;
+
+/* Node structure needed for Strand Sort */
 typedef struct Node {
     int value;
     struct Node *next;
@@ -249,6 +257,36 @@ void strand_sort(int *to_sort, int size) {
     delete_list(list_to_sort);
 }
 
+void smooth_sort(int *to_sort, int size) {
+    int i;
+    leonardo_dimensions dim;
+    /* Allocate resources for a maximum list size of log(size) */
+    dim.v = malloc(((int)log2(size) + 1) * sizeof(int));
+    dim.size = 2;
+    /* The first two leonardo heaps are L(1) and L(0) */
+    dim.v[0] = 1;
+    dim.v[1] = 0;
+
+    for (i = 2; i < size; i++) {
+        if ((dim.v[dim.size - 2] - dim.v[dim.size - 1]) == 1) {
+            dim.v[dim.size - 2]++;
+            dim.size--;
+        }
+        else if (dim.v[dim.size - 1] == 1) {
+            dim.v[dim.size] = 0;
+            dim.size++;
+        }
+        else {
+            dim.v[dim.size] = 1;
+            dim.size++;
+        }
+    }
+    printf("Test leo trees, size %d: ", dim.size);
+    print(dim.v, dim.size);
+}
+
+
+
 int main() {
     int *v = malloc(10 * sizeof(int));
     int i, j;
@@ -258,7 +296,7 @@ int main() {
     v[6] = -4;
     v[8] = -1;
     print(v, 10);
-    strand_sort(v, 10);
+    smooth_sort(v, 10);
     print(v, 10);
     free(v);
 
