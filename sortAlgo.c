@@ -11,6 +11,9 @@ typedef struct {
     int size;
 } leonardo_dimensions;
 
+int L[] = {1, 1, 3, 5, 9, 15, 25, 41, 67, 109,
+          177, 287, 465, 753, 1219, 1973, 3193, 5167, 8361};
+
 /* Node structure needed for Strand Sort */
 typedef struct Node {
     int value;
@@ -257,9 +260,33 @@ void strand_sort(int *to_sort, int size) {
     delete_list(list_to_sort);
 }
 
+void heapify(int *to_sort, int k, int pos) {
+    if (k <= 1) {
+        return;
+    } else {
+        int left, right, largest, tmp_k;
+        left = pos - L[k - 2] - 1;
+        right = pos - 1;
+        largest = pos;
+        if (to_sort[left]  > to_sort[largest]) {
+            largest = left;
+            tmp_k = k - 1;
+        }
+        if (to_sort[right] > to_sort[largest]) {
+            largest = right;
+            tmp_k = k - 2;
+        }
+
+        if (largest == pos) {
+            return;
+        } else {
+            swap(&to_sort[pos], &to_sort[largest]);
+            heapify(to_sort, tmp_k, largest);
+        }
+    }
+}
+
 void smooth_sort(int *to_sort, int size) {
-    int L[] = {1, 1, 3, 5, 9, 15, 25, 41, 67, 109,
-              177, 287, 465, 753, 1219, 1973, 3193, 5167, 8361};
     int i, to_insert, cur_pos, j;
     leonardo_dimensions dim;
     /* Allocate resources for a maximum list size of log(size) */
@@ -291,9 +318,9 @@ void smooth_sort(int *to_sort, int size) {
          * than the current one, but also if it is bigger than the
          * current root's children */
         to_insert = to_sort[i];
-        j = dim.size;
+        j = dim.size - 1;
         cur_pos = i;
-        while (j > 1 && to_sort[cur_pos - L[dim.v[j]]] > to_insert) {
+        while (j > 0 && to_sort[cur_pos - L[dim.v[j]]] > to_insert) {
             if (dim.v[j] >= 2) {
                 if (to_sort[cur_pos - L[j]] > to_sort[cur_pos - 1] &&
                         to_sort[cur_pos - L[j]] > to_sort[L[dim.v[j] - 2] - 1]) {
@@ -309,6 +336,7 @@ void smooth_sort(int *to_sort, int size) {
             j--;
         }
         to_sort[cur_pos] = to_insert;
+        heapify(to_sort, dim.v[j], cur_pos);
     }
     printf("Test leo trees, size %d: ", dim.size);
     print(dim.v, dim.size);
@@ -318,15 +346,20 @@ void smooth_sort(int *to_sort, int size) {
 
 int main() {
     int *v = malloc(10 * sizeof(int));
+    int u[] = {27, 18, 28, 31, 41, 45, 26, 53, 58, 59, 54, 90, 93, 13};
     int i, j;
-    for (i = 0, j = 10; i < 9; i++)
+    for (i = 0, j = 10; i < 10; i++)
         v[i] = j--;
     v[0] = -7;
     v[6] = -4;
     v[8] = -1;
-    print(v, 9);
-    smooth_sort(v, 9);
-    print(v, 9);
+    print(v, 10);
+    smooth_sort(v, 10);
+    print(v, 10);
+
+    //print(u, 14);
+    //smooth_sort(u, 14);
+    //print(u, 14);
     free(v);
 
     return 0;
