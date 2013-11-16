@@ -258,7 +258,9 @@ void strand_sort(int *to_sort, int size) {
 }
 
 void smooth_sort(int *to_sort, int size) {
-    int i;
+    int L[] = {1, 1, 3, 5, 9, 15, 25, 41, 67, 109,
+              177, 287, 465, 753, 1219, 1973, 3193, 5167, 8361};
+    int i, to_insert, cur_pos, j;
     leonardo_dimensions dim;
     /* Allocate resources for a maximum list size of log(size) */
     dim.v = malloc(((int)log2(size) + 1) * sizeof(int));
@@ -267,19 +269,46 @@ void smooth_sort(int *to_sort, int size) {
     dim.v[0] = 1;
     dim.v[1] = 0;
 
+    /* Left Child: cur_pos - L[k - 2] - 1
+     * Right Child: cur_pos - 1
+     */
+
+    /* Create the Leonardo heaps on top of the existing array */
     for (i = 2; i < size; i++) {
-        if ((dim.v[dim.size - 2] - dim.v[dim.size - 1]) == 1) {
+        if ((dim.size >= 2) && (dim.v[dim.size - 2] - dim.v[dim.size - 1]) == 1) {
             dim.v[dim.size - 2]++;
             dim.size--;
-        }
-        else if (dim.v[dim.size - 1] == 1) {
+        } else if (dim.v[dim.size - 1] == 1) {
             dim.v[dim.size] = 0;
             dim.size++;
-        }
-        else {
+        } else {
             dim.v[dim.size] = 1;
             dim.size++;
         }
+        
+        /* Perform a sligthly modified insertion sort:
+         * not only check if the previous leonardo heap root is bigger
+         * than the current one, but also if it is bigger than the
+         * current root's children */
+        to_insert = to_sort[i];
+        j = dim.size;
+        cur_pos = i;
+        while (j > 1 && to_sort[cur_pos - L[dim.v[j]]] > to_insert) {
+            if (dim.v[j] >= 2) {
+                if (to_sort[cur_pos - L[j]] > to_sort[cur_pos - 1] &&
+                        to_sort[cur_pos - L[j]] > to_sort[L[dim.v[j] - 2] - 1]) {
+                    to_sort[cur_pos] = to_sort[cur_pos - L[dim.v[j]]];
+                    cur_pos -= L[dim.v[j]];
+                } else {
+                    break;
+                }
+            } else {
+                to_sort[cur_pos] = to_sort[cur_pos - L[dim.v[j]]];
+                cur_pos -= L[dim.v[j]];
+            }
+            j--;
+        }
+        to_sort[cur_pos] = to_insert;
     }
     printf("Test leo trees, size %d: ", dim.size);
     print(dim.v, dim.size);
@@ -290,14 +319,14 @@ void smooth_sort(int *to_sort, int size) {
 int main() {
     int *v = malloc(10 * sizeof(int));
     int i, j;
-    for (i = 0, j = 10; i < 10; i++)
+    for (i = 0, j = 10; i < 9; i++)
         v[i] = j--;
     v[0] = -7;
     v[6] = -4;
     v[8] = -1;
-    print(v, 10);
-    smooth_sort(v, 10);
-    print(v, 10);
+    print(v, 9);
+    smooth_sort(v, 9);
+    print(v, 9);
     free(v);
 
     return 0;
