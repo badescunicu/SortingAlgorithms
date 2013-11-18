@@ -11,6 +11,7 @@ typedef struct {
     int size;
 } leonardo_dimensions;
 
+/* List of Leonardo numbers precomputed for efficiency */
 int L[] = {1, 1, 3, 5, 9, 15, 25, 41, 67, 109,
           177, 287, 465, 753, 1219, 1973, 3193, 5167, 8361};
 
@@ -286,6 +287,35 @@ void heapify(int *to_sort, int k, int pos) {
     }
 }
 
+/* Perform a sligthly modified insertion sort:
+ * not only check if the previous leonardo heap root is bigger
+ * than the current one, but also if it is bigger than the
+ * current root's children.
+ * Also, do a heapify operation on the modified heap*/
+void rebalance_heaps(int *to_sort, int *v, int size, int position) {
+    int j, cur_pos, to_insert;
+    j = size - 1;
+    cur_pos = position;
+    to_insert = to_sort[cur_pos];
+    while (j > 0 && to_sort[cur_pos - L[v[j]]] > to_insert) {
+        if (v[j] >= 2) {
+            if (to_sort[cur_pos - L[j]] > to_sort[cur_pos - 1] &&
+                    to_sort[cur_pos - L[j]] > to_sort[L[v[j] - 2] - 1]) {
+                to_sort[cur_pos] = to_sort[cur_pos - L[v[j]]];
+                cur_pos -= L[v[j]];
+            } else {
+                break;
+            }
+        } else {
+            to_sort[cur_pos] = to_sort[cur_pos - L[v[j]]];
+            cur_pos -= L[v[j]];
+        }
+        j--;
+    }
+    to_sort[cur_pos] = to_insert;
+    heapify(to_sort, v[j], cur_pos);
+}
+
 void smooth_sort(int *to_sort, int size) {
     int i, to_insert, cur_pos, j, tmp_root;
     leonardo_dimensions dim;
@@ -295,10 +325,6 @@ void smooth_sort(int *to_sort, int size) {
     /* The first two leonardo heaps are L(1) and L(0) */
     dim.v[0] = 1;
     dim.v[1] = 0;
-
-    /* Left Child: cur_pos - L[k - 2] - 1
-     * Right Child: cur_pos - 1
-     */
 
     /* Create the Leonardo heaps on top of the existing array */
     for (i = 2; i < size; i++) {
@@ -313,34 +339,8 @@ void smooth_sort(int *to_sort, int size) {
             dim.size++;
         }
         
-        /* Perform a sligthly modified insertion sort:
-         * not only check if the previous leonardo heap root is bigger
-         * than the current one, but also if it is bigger than the
-         * current root's children */
-        to_insert = to_sort[i];
-        j = dim.size - 1;
-        cur_pos = i;
-        while (j > 0 && to_sort[cur_pos - L[dim.v[j]]] > to_insert) {
-            if (dim.v[j] >= 2) {
-                if (to_sort[cur_pos - L[j]] > to_sort[cur_pos - 1] &&
-                        to_sort[cur_pos - L[j]] > to_sort[L[dim.v[j] - 2] - 1]) {
-                    to_sort[cur_pos] = to_sort[cur_pos - L[dim.v[j]]];
-                    cur_pos -= L[dim.v[j]];
-                } else {
-                    break;
-                }
-            } else {
-                to_sort[cur_pos] = to_sort[cur_pos - L[dim.v[j]]];
-                cur_pos -= L[dim.v[j]];
-            }
-            j--;
-        }
-        to_sort[cur_pos] = to_insert;
-        heapify(to_sort, dim.v[j], cur_pos);
+        rebalance_heaps(to_sort, dim.v, dim.size, i);
     }
-    printf("Before dequeuing:\n");
-    printf("Test leo trees, size %d: ", dim.size);
-    print(dim.v, dim.size);
 
     /* Dequeue from the Leonardo heaps until there are no more heaps */
     i = size - 1;
@@ -356,54 +356,15 @@ void smooth_sort(int *to_sort, int size) {
             dim.v[dim.size - 2] = tmp_root - 1;
             dim.v[dim.size - 1] = tmp_root - 2;
 
-            /* Rebalance the heaps using the modified insertion sort */
-            cur_pos = i - 1;
-            to_insert = to_sort[cur_pos];
-            j = dim.size - 2;
-            while (j > 0 && to_sort[cur_pos - L[dim.v[j]]] > to_insert) {
-                if (dim.v[j] >= 2) {
-                    if (to_sort[cur_pos - L[j]] > to_sort[cur_pos - 1] &&
-                            to_sort[cur_pos - L[j]] > to_sort[L[dim.v[j] - 2] - 1]) {
-                        to_sort[cur_pos] = to_sort[cur_pos - L[dim.v[j]]];
-                        cur_pos -= L[dim.v[j]];
-                    } else {
-                        break;
-                    }
-                } else {
-                    to_sort[cur_pos] = to_sort[cur_pos - L[dim.v[j]]];
-                    cur_pos -= L[dim.v[j]];
-                }
-                j--;
-            }
-            to_sort[cur_pos] = to_insert;
-            heapify(to_sort, dim.v[j], cur_pos);
+            /* Rebalance the left child */
+            rebalance_heaps(to_sort, dim.v, dim.size - 1, i - 1);
 
-            
-            cur_pos = i;
-            to_insert = to_sort[cur_pos];
-            j = dim.size - 1;
-            while (j > 0 && to_sort[cur_pos - L[dim.v[j]]] > to_insert) {
-                if (dim.v[j] >= 2) {
-                    if (to_sort[cur_pos - L[j]] > to_sort[cur_pos - 1] &&
-                            to_sort[cur_pos - L[j]] > to_sort[L[dim.v[j] - 2] - 1]) {
-                        to_sort[cur_pos] = to_sort[cur_pos - L[dim.v[j]]];
-                        cur_pos -= L[dim.v[j]];
-                    } else {
-                        break;
-                    }
-                } else {
-                    to_sort[cur_pos] = to_sort[cur_pos - L[dim.v[j]]];
-                    cur_pos -= L[dim.v[j]];
-                }
-                j--;
-            }
-            to_sort[cur_pos] = to_insert;
-            heapify(to_sort, dim.v[j], cur_pos);
+            /* Rebalance the right child */
+            rebalance_heaps(to_sort, dim.v, dim.size, i);
         }
 
     }
-    printf("Test leo trees, size %d: ", dim.size);
-    print(dim.v, dim.size);
+    free(dim.v);
 }
 
 
