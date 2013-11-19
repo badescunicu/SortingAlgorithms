@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <math.h>
+#include <time.h>
 
 #define GAPS_SIZE 8
 
@@ -25,6 +26,47 @@ Node* init_list() {
     Node *new = malloc(sizeof(Node));
     new->value = INT_MIN;
     new->next = NULL;
+}
+
+/* Copy an array */
+int* copy_array(int *v, int size) {
+    int i;
+    int *new = malloc(size * sizeof(int));
+    for (i = 0; i < size; i++) {
+        new[i] = v[i];
+    }
+    return new;
+}
+
+/* Generate an ordered array of given size */
+int* generate_ordered_array(int size) {
+    int i;
+    int *new = malloc(size * sizeof(int));
+    for (i = 0; i < size; i++) {
+        new[i] = i + 1;
+    }
+    return new;
+}
+
+/* Generate a reverse ordered array */
+int* generate_reverse_ordered_array(int size) {
+    int i, j;
+    int *new = malloc(size * sizeof(int));
+    for (i = 0, j = size; i < size; i++, j--) {
+        new[i] = j;
+    }
+    return new;
+}
+
+/* Generate a random array of given size with values in [1, 100] */
+int* generate_random_array(int size) {
+    int i;
+    int *v = malloc(size * sizeof(int));
+    srand(time(NULL));
+    for (i = 0; i < size; i++) {
+        v[i] = rand() % 100 + 1;
+    }
+    return v;
 }
 
 /* Insert a node at the beginning of a list */
@@ -370,27 +412,63 @@ void smooth_sort(int *to_sort, int size) {
 
 
 int main() {
-    int *v = malloc(10 * sizeof(int));
-    int u[] = {27, 18, 28, 31, 41, 45, 26, 53, 58, 59, 54, 90, 93, 13};
-    int t[] = {3, 1, 4, 2, 11, 9, 6, 7, 0, 8, 5, 10};
-    int i, j;
-    for (i = 0, j = 10; i < 10; i++)
-        v[i] = j--;
-    v[0] = -7;
-    v[6] = -4;
-    v[8] = -1;
-    print(v, 9);
-    smooth_sort(v, 9);
-    print(v, 9);
+    int *v = generate_reverse_ordered_array(10);
+    int *tmp;
 
-    print(u, 13);
-    smooth_sort(u, 13);
-    print(u, 13);
+    tmp = copy_array(v, 10);
+    //printf("smooth_sort\n\n");
+    //print(tmp, 10);
+    smooth_sort(tmp, 10);
+    print(tmp, 10);
+    free(tmp);
+
+    tmp = copy_array(v, 10);
+    //printf("strand_sort\n\n");
+    //print(tmp, 10);
+    strand_sort(tmp, 10);
+    print(tmp, 10);
+    free(tmp);
+
+    tmp = copy_array(v, 10);
+    //printf("shellsort\n\n");
+    //print(tmp, 10);
+    shellsort(tmp, 10);
+    print(tmp, 10);
+    free(tmp);
+
+
+    tmp = copy_array(v, 10);
+    //printf("quicksort_wrapper\n\n");
+    //print(tmp, 10);
+    quicksort_wrapper(tmp, 10);
+    print(tmp, 10);
+    free(tmp);
+
+
+    tmp = copy_array(v, 10);
+    //printf("cocktail_sort\n\n");
+    //print(tmp, 10);
+    cocktail_sort(tmp, 10);
+    print(tmp, 10);
+    free(tmp);
+
+
+    tmp = copy_array(v, 10);
+    //printf("bubble_sort\n\n");
+   // print(tmp, 10);
+    bubble_sort(tmp, 10);
+    print(tmp, 10);
+    free(tmp);
+
+
+    tmp = copy_array(v, 10);
+    //printf("insertion_sort\n\n");
+    //print(tmp, 10);
+    insertion_sort(tmp, 10);
+    print(tmp, 10);
+    free(tmp);
+
     free(v);
-
-    print(t, 12);
-    smooth_sort(t, 12);
-    print(t, 12);
 
     return 0;
 }
