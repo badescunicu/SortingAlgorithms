@@ -7,7 +7,7 @@
 #define GAPS_SIZE 8
 
 /* Variables to keep track of elementary operations */
-int total_smooth, total_quick, total_cocktail, total_bubble,
+long long total_smooth, total_quick, total_cocktail, total_bubble,
     total_insertion, total_shell, total_strand;
 
 /* List to hold the dimensions of the Leonardo heaps used in Smoothsort*/
@@ -488,8 +488,64 @@ void smooth_sort(int *to_sort, int size) {
     total_smooth++;
 }
 
+void apply_sorts(int *v, int no_of_elements) {
+    int *tmp;
+    /* Reset the counters to 0 */
+    total_smooth = 0;
+    total_strand = 0;
+    total_shell = 0;
+    total_quick = 0;
+    total_cocktail = 0;
+    total_bubble = 0;
+    total_insertion = 0;
+
+    tmp = copy_array(v, no_of_elements);
+    printf("Smoothsort -> ");
+    smooth_sort(tmp, no_of_elements);
+    free(tmp);
+    printf("Total operations: %lld\n", total_smooth);
+
+    tmp = copy_array(v, no_of_elements);
+    printf("Strand Sort -> ");
+    strand_sort(tmp, no_of_elements);
+    free(tmp);
+    printf("Total operations: %lld\n", total_strand);
+
+    tmp = copy_array(v, no_of_elements);
+    printf("Shell Sort -> ");
+    shellsort(tmp, no_of_elements);
+    free(tmp);
+    printf("Total operations: %lld\n", total_shell);
+
+    tmp = copy_array(v, no_of_elements);
+    printf("Quicksort -> ");
+    quicksort_wrapper(tmp, no_of_elements);
+    free(tmp);
+    printf("Total operations: %lld\n", total_quick);
+
+    tmp = copy_array(v, no_of_elements);
+    printf("Cocktail Sort -> ");
+    cocktail_sort(tmp, no_of_elements);
+    free(tmp);
+    printf("Total operations: %lld\n", total_cocktail);
+
+    tmp = copy_array(v, no_of_elements);
+    printf("Bubble Sort -> ");
+    bubble_sort(tmp, no_of_elements);
+    free(tmp);
+    printf("Total operations: %lld\n", total_bubble);
+
+    tmp = copy_array(v, no_of_elements);
+    printf("Insertion Sort -> ");
+    insertion_sort(tmp, no_of_elements);
+    free(tmp);
+    printf("Total operations: %lld\n", total_insertion);
+
+    free(v);
+}
+
 int main() {
-    int *v, *tmp;
+    int *v, *tmp, no_of_elements;
     char choice;
     printf("Analysis of Algorithms - Homework #1\n");
     printf("Enter 1 for Testing Mode\n");
@@ -498,66 +554,123 @@ int main() {
 
     switch(choice) {
         case '1':
-            v = generate_random_array(10, 100);
-            printf("Given array: ");
-            print(v, 10);
+            no_of_elements = 10;
+            v = generate_random_array(no_of_elements, 100);
+            printf("Random array: ");
+            print(v, no_of_elements);
 
-            tmp = copy_array(v, 10);
+            tmp = copy_array(v, no_of_elements);
             printf("\nSmoothsort:\n");
-            smooth_sort(tmp, 10);
-            print(tmp, 10);
+            smooth_sort(tmp, no_of_elements);
+            print(tmp, no_of_elements);
             free(tmp);
-            printf("Total operations: %d\n", total_smooth);
+            printf("Total operations: %lld\n", total_smooth);
 
-            tmp = copy_array(v, 10);
+            tmp = copy_array(v, no_of_elements);
             printf("\nStrand Sort\n");
-            strand_sort(tmp, 10);
-            print(tmp, 10);
+            strand_sort(tmp, no_of_elements);
+            print(tmp, no_of_elements);
             free(tmp);
-            printf("Total operations: %d\n", total_strand);
+            printf("Total operations: %lld\n", total_strand);
 
-            tmp = copy_array(v, 10);
+            tmp = copy_array(v, no_of_elements);
             printf("\nShell Sort\n");
-            shellsort(tmp, 10);
-            print(tmp, 10);
+            shellsort(tmp, no_of_elements);
+            print(tmp, no_of_elements);
             free(tmp);
-            printf("Total operations: %d\n", total_shell);
+            printf("Total operations: %lld\n", total_shell);
 
-            tmp = copy_array(v, 10);
+            tmp = copy_array(v, no_of_elements);
             printf("\nQuicksort\n");
-            quicksort_wrapper(tmp, 10);
-            print(tmp, 10);
+            quicksort_wrapper(tmp, no_of_elements);
+            print(tmp, no_of_elements);
             free(tmp);
-            printf("Total operations: %d\n", total_quick);
+            printf("Total operations: %lld\n", total_quick);
 
-            tmp = copy_array(v, 10);
+            tmp = copy_array(v, no_of_elements);
             printf("\nCocktail Sort\n");
-            cocktail_sort(tmp, 10);
-            print(tmp, 10);
+            cocktail_sort(tmp, no_of_elements);
+            print(tmp, no_of_elements);
             free(tmp);
-            printf("Total operations: %d\n", total_cocktail);
+            printf("Total operations: %lld\n", total_cocktail);
 
-            tmp = copy_array(v, 10);
+            tmp = copy_array(v, no_of_elements);
             printf("\nBubble Sort\n");
-            bubble_sort(tmp, 10);
-            print(tmp, 10);
+            bubble_sort(tmp, no_of_elements);
+            print(tmp, no_of_elements);
             free(tmp);
-            printf("Total operations: %d\n", total_bubble);
+            printf("Total operations: %lld\n", total_bubble);
 
-            tmp = copy_array(v, 10);
+            tmp = copy_array(v, no_of_elements);
             printf("\nInsertion Sort\n");
-            insertion_sort(tmp, 10);
-            print(tmp, 10);
+            insertion_sort(tmp, no_of_elements);
+            print(tmp, no_of_elements);
             free(tmp);
-            printf("Total operations: %d\n", total_insertion);
+            printf("Total operations: %lld\n", total_insertion);
 
             free(v);
             break;
         
         case '2':
-            break;
+            /* Sorted arrays */
+            /* Size 10 */
+            no_of_elements = 10;
+            printf("\nSorted array (size %d)\n", no_of_elements);
+            v = generate_ordered_array(no_of_elements);
+            apply_sorts(v, no_of_elements);
+
+            /* Size 300 */
+            no_of_elements = 300;
+            printf("\nSorted array (size %d)\n", no_of_elements);
+            v = generate_ordered_array(no_of_elements);
+            apply_sorts(v, no_of_elements);
 
 
+            /* Size 10000 */
+            no_of_elements = 10000;
+            printf("\nSorted array (size %d)\n", no_of_elements);
+            v = generate_ordered_array(no_of_elements);
+            apply_sorts(v, no_of_elements);
+
+            /* Random arrays */
+            /* Size 10 */
+            no_of_elements = 10;
+            printf("\nRandom array (size %d)\n", no_of_elements);
+            v = generate_random_array(no_of_elements, INT_MAX);
+            apply_sorts(v, no_of_elements);
+
+            /* Size 300 */
+            no_of_elements = 300;
+            printf("\nRandom array (size %d)\n", no_of_elements);
+            v = generate_random_array(no_of_elements, INT_MAX);
+            apply_sorts(v, no_of_elements);
+
+
+            /* Size 10000 */
+            no_of_elements = 10000;
+            printf("\nRandom array (size %d)\n", no_of_elements);
+            v = generate_random_array(no_of_elements, INT_MAX);
+            apply_sorts(v, no_of_elements);
+
+            /* Reverse ordered arrays */
+            /* Size 10 */
+            no_of_elements = 10;
+            printf("\nReverse ordered array (size %d)\n", no_of_elements);
+            v = generate_reverse_ordered_array(no_of_elements);
+            apply_sorts(v, no_of_elements);
+
+            /* Size 300 */
+            no_of_elements = 300;
+            printf("\nReverse ordered array (size %d)\n", no_of_elements);
+            v = generate_reverse_ordered_array(no_of_elements);
+            apply_sorts(v, no_of_elements);
+
+
+            /* Size 10000 */
+            no_of_elements = 10000;
+            printf("\nReverse ordered array (size %d)\n", no_of_elements);
+            v = generate_reverse_ordered_array(no_of_elements);
+            apply_sorts(v, no_of_elements);
         }
 
     return 0;
