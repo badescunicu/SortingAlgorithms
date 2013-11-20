@@ -358,6 +358,7 @@ void strand_sort(int *to_sort, int size) {
 }
 
 void heapify(int *to_sort, int k, int pos) {
+    total_smooth++;
     if (k <= 1) {
         return;
     } else {
@@ -365,13 +366,17 @@ void heapify(int *to_sort, int k, int pos) {
         left = pos - L[k - 2] - 1;
         right = pos - 1;
         largest = pos;
+
+        total_smooth += 15;
         if (to_sort[left]  > to_sort[largest]) {
             largest = left;
             tmp_k = k - 1;
+            total_smooth += 3;
         }
         if (to_sort[right] > to_sort[largest]) {
             largest = right;
             tmp_k = k - 2;
+            total_smooth += 3;
         }
 
         if (largest == pos) {
@@ -379,6 +384,7 @@ void heapify(int *to_sort, int k, int pos) {
         } else {
             swap(&to_sort[pos], &to_sort[largest]);
             heapify(to_sort, tmp_k, largest);
+            total_smooth += 2;
         }
     }
 }
@@ -393,23 +399,30 @@ void rebalance_heaps(int *to_sort, int *v, int size, int position) {
     j = size - 1;
     cur_pos = position;
     to_insert = to_sort[cur_pos];
+    total_smooth += 12;
     while (j > 0 && to_sort[cur_pos - L[v[j]]] > to_insert) {
+        total_smooth += 11;
         if (v[j] >= 2) {
+            total_smooth += 18;
             if (to_sort[cur_pos - L[v[j]]] > to_sort[cur_pos - 1] &&
                     to_sort[cur_pos - L[v[j]]] > to_sort[cur_pos - L[v[j] - 2] - 1]) {
                 to_sort[cur_pos] = to_sort[cur_pos - L[v[j]]];
                 cur_pos -= L[v[j]];
+                total_smooth += 9;
             } else {
                 break;
             }
         } else {
             to_sort[cur_pos] = to_sort[cur_pos - L[v[j]]];
             cur_pos -= L[v[j]];
+            total_smooth += 10;
         }
         j--;
+        total_smooth += 2;
     }
     to_sort[cur_pos] = to_insert;
     heapify(to_sort, v[j], cur_pos);
+    total_smooth += 3;
 }
 
 void smooth_sort(int *to_sort, int size) {
@@ -421,28 +434,40 @@ void smooth_sort(int *to_sort, int size) {
     /* The first leonardo heap is L(1) */
     dim.v[0] = 1;
 
+    total_smooth += 11;
+
     /* Create the Leonardo heaps on top of the existing array */
+    total_smooth += 2;
     for (i = 1; i < size; i++) {
+        
+        total_smooth += 18;
         if ((dim.size >= 2) && (dim.v[dim.size - 2] - dim.v[dim.size - 1]) == 1) {
             dim.v[dim.size - 2]++;
             dim.size--;
+            total_smooth += 9;
         } else if (dim.v[dim.size - 1] == 1) {
             dim.v[dim.size] = 0;
             dim.size++;
+            total_smooth += 7;
         } else {
             dim.v[dim.size] = 1;
             dim.size++;
+            total_smooth += 7;
         }
         
         rebalance_heaps(to_sort, dim.v, dim.size, i);
+        total_smooth += 2;
     }
 
     /* Dequeue from the Leonardo heaps until there are no more elements */
     i = size - 1;
+    total_smooth += 3;
     while (i >= 0) {
+        total_smooth += 6;
         if (dim.v[dim.size - 1] <= 1) {
             i--;
             dim.size--;
+            total_smooth += 5;
         } else {
             /* Split the root in two */
             i--;
@@ -456,9 +481,11 @@ void smooth_sort(int *to_sort, int size) {
 
             /* Rebalance the right child */
             rebalance_heaps(to_sort, dim.v, dim.size, i);
+            total_smooth += 30;
         }
     }
     free(dim.v);
+    total_smooth++;
 }
 
 int main() {
