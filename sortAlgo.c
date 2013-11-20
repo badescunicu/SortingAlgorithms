@@ -334,7 +334,7 @@ void strand_sort(int *to_sort, int size) {
                 total_strand += 2;
             }
         }
-        total_stran += 2;
+        total_strand += 2;
         while (last_sublist->next) {
             insert_at(list_iterator, last_sublist->value);
             list_iterator = list_iterator->next;
@@ -494,10 +494,10 @@ int main() {
     printf("Analysis of Algorithms - Homework #1\n");
     printf("Enter 1 for Testing Mode\n");
     printf("Enter 2 for Analysis Mode\n");
-    //scanf("%c", &choice);
+    scanf("%c", &choice);
 
-    //switch(choice) {
-     //   case '1':
+    switch(choice) {
+        case '1':
             v = generate_random_array(10, 100);
             printf("Given array: ");
             print(v, 10);
@@ -506,53 +506,59 @@ int main() {
             printf("\nSmoothsort:\n");
             smooth_sort(tmp, 10);
             print(tmp, 10);
-            printf("total_smooth: %d\n", total_smooth);
             free(tmp);
+            printf("Total operations: %d\n", total_smooth);
 
             tmp = copy_array(v, 10);
             printf("\nStrand Sort\n");
             strand_sort(tmp, 10);
             print(tmp, 10);
             free(tmp);
-            printf("total_strand: %d\n", total_strand);
+            printf("Total operations: %d\n", total_strand);
 
             tmp = copy_array(v, 10);
             printf("\nShell Sort\n");
             shellsort(tmp, 10);
             print(tmp, 10);
             free(tmp);
+            printf("Total operations: %d\n", total_shell);
 
             tmp = copy_array(v, 10);
             printf("\nQuicksort\n");
             quicksort_wrapper(tmp, 10);
             print(tmp, 10);
             free(tmp);
+            printf("Total operations: %d\n", total_quick);
 
             tmp = copy_array(v, 10);
             printf("\nCocktail Sort\n");
             cocktail_sort(tmp, 10);
             print(tmp, 10);
             free(tmp);
+            printf("Total operations: %d\n", total_cocktail);
 
             tmp = copy_array(v, 10);
             printf("\nBubble Sort\n");
             bubble_sort(tmp, 10);
             print(tmp, 10);
             free(tmp);
+            printf("Total operations: %d\n", total_bubble);
 
             tmp = copy_array(v, 10);
             printf("\nInsertion Sort\n");
             insertion_sort(tmp, 10);
             print(tmp, 10);
             free(tmp);
+            printf("Total operations: %d\n", total_insertion);
 
             free(v);
-            //break;
+            break;
         
-        //case '2':
+        case '2':
+            break;
 
 
-        //}
+        }
 
     return 0;
 }
