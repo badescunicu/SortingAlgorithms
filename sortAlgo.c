@@ -341,8 +341,8 @@ void rebalance_heaps(int *to_sort, int *v, int size, int position) {
     to_insert = to_sort[cur_pos];
     while (j > 0 && to_sort[cur_pos - L[v[j]]] > to_insert) {
         if (v[j] >= 2) {
-            if (to_sort[cur_pos - L[j]] > to_sort[cur_pos - 1] &&
-                    to_sort[cur_pos - L[j]] > to_sort[L[v[j] - 2] - 1]) {
+            if (to_sort[cur_pos - L[v[j]]] > to_sort[cur_pos - 1] &&
+                    to_sort[cur_pos - L[v[j]]] > to_sort[cur_pos - L[v[j] - 2] - 1]) {
                 to_sort[cur_pos] = to_sort[cur_pos - L[v[j]]];
                 cur_pos -= L[v[j]];
             } else {
@@ -363,13 +363,12 @@ void smooth_sort(int *to_sort, int size) {
     leonardo_dimensions dim;
     /* Allocate resources for a maximum list size of log(size) */
     dim.v = malloc(((int)log2(size) + 1) * sizeof(int));
-    dim.size = 2;
-    /* The first two leonardo heaps are L(1) and L(0) */
+    dim.size = 1;
+    /* The first leonardo heap is L(1) */
     dim.v[0] = 1;
-    dim.v[1] = 0;
 
     /* Create the Leonardo heaps on top of the existing array */
-    for (i = 2; i < size; i++) {
+    for (i = 1; i < size; i++) {
         if ((dim.size >= 2) && (dim.v[dim.size - 2] - dim.v[dim.size - 1]) == 1) {
             dim.v[dim.size - 2]++;
             dim.size--;
@@ -384,9 +383,14 @@ void smooth_sort(int *to_sort, int size) {
         rebalance_heaps(to_sort, dim.v, dim.size, i);
     }
 
-    /* Dequeue from the Leonardo heaps until there are no more heaps */
+    print(to_sort, size);
+
+    /* Dequeue from the Leonardo heaps until there are no more elements */
     i = size - 1;
     while (i >= 0) {
+        printf("\nto_sort i=%d : ", i);
+        print(dim.v, dim.size);
+        print(to_sort, size);
         if (dim.v[dim.size - 1] <= 1) {
             i--;
             dim.size--;
@@ -399,12 +403,19 @@ void smooth_sort(int *to_sort, int size) {
             dim.v[dim.size - 1] = tmp_root - 2;
 
             /* Rebalance the left child */
-            rebalance_heaps(to_sort, dim.v, dim.size - 1, i - 1);
+            rebalance_heaps(to_sort, dim.v, dim.size - 1, i - L[tmp_root - 2]);
+            print(dim.v, dim.size - 1);
+            printf("position: %d\n", i - L[tmp_root - 2]);
 
             /* Rebalance the right child */
             rebalance_heaps(to_sort, dim.v, dim.size, i);
+            print(dim.v, dim.size);
+            printf("position: %d\n", i);
         }
-
+        printf("to_sort i=%d : ", i);
+        print(dim.v, dim.size);
+        print(to_sort, size);
+        printf("\n");
     }
     free(dim.v);
 }
@@ -417,56 +428,56 @@ int main() {
 
     tmp = copy_array(v, 10);
     //printf("smooth_sort\n\n");
-    //print(tmp, 10);
+    print(tmp, 10);
     smooth_sort(tmp, 10);
     print(tmp, 10);
     free(tmp);
 
-    tmp = copy_array(v, 10);
-    //printf("strand_sort\n\n");
-    //print(tmp, 10);
-    strand_sort(tmp, 10);
-    print(tmp, 10);
-    free(tmp);
-
-    tmp = copy_array(v, 10);
-    //printf("shellsort\n\n");
-    //print(tmp, 10);
-    shellsort(tmp, 10);
-    print(tmp, 10);
-    free(tmp);
-
-
-    tmp = copy_array(v, 10);
-    //printf("quicksort_wrapper\n\n");
-    //print(tmp, 10);
-    quicksort_wrapper(tmp, 10);
-    print(tmp, 10);
-    free(tmp);
-
-
-    tmp = copy_array(v, 10);
-    //printf("cocktail_sort\n\n");
-    //print(tmp, 10);
-    cocktail_sort(tmp, 10);
-    print(tmp, 10);
-    free(tmp);
-
-
-    tmp = copy_array(v, 10);
-    //printf("bubble_sort\n\n");
+   // tmp = copy_array(v, 10);
+   // //printf("strand_sort\n\n");
+   // //print(tmp, 10);
+   // strand_sort(tmp, 10);
    // print(tmp, 10);
-    bubble_sort(tmp, 10);
-    print(tmp, 10);
-    free(tmp);
+   // free(tmp);
+
+   // tmp = copy_array(v, 10);
+   // //printf("shellsort\n\n");
+   // //print(tmp, 10);
+   // shellsort(tmp, 10);
+   // print(tmp, 10);
+   // free(tmp);
 
 
-    tmp = copy_array(v, 10);
-    //printf("insertion_sort\n\n");
-    //print(tmp, 10);
-    insertion_sort(tmp, 10);
-    print(tmp, 10);
-    free(tmp);
+   // tmp = copy_array(v, 10);
+   // //printf("quicksort_wrapper\n\n");
+   // //print(tmp, 10);
+   // quicksort_wrapper(tmp, 10);
+   // print(tmp, 10);
+   // free(tmp);
+
+
+   // tmp = copy_array(v, 10);
+   // //printf("cocktail_sort\n\n");
+   // //print(tmp, 10);
+   // cocktail_sort(tmp, 10);
+   // print(tmp, 10);
+   // free(tmp);
+
+
+   // tmp = copy_array(v, 10);
+   // //printf("bubble_sort\n\n");
+   //// print(tmp, 10);
+   // bubble_sort(tmp, 10);
+   // print(tmp, 10);
+   // free(tmp);
+
+
+   // tmp = copy_array(v, 10);
+   // //printf("insertion_sort\n\n");
+   // //print(tmp, 10);
+   // insertion_sort(tmp, 10);
+   // print(tmp, 10);
+   // free(tmp);
 
     free(v);
 
